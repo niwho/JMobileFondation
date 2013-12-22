@@ -2,4 +2,10 @@
 <resources>
     <string name="hello">Hello World, JMFoundation!</string>
     <string name="app_name">牧草管理系统</string>
+    
+    <string name="position">我的位置</string>
+    <string name="gpslogging">跟踪中</string>
+    <string name="find">适宜性评价</string>
+    <string name="query">路线查询</string>
+    <string name="more">更多</string>
 </resources>
