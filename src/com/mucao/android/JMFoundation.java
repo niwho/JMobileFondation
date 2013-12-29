@@ -63,28 +63,28 @@ public class JMFoundation extends Activity {
 		
 
 		//Sets 'OnSingleTapListener' to 'MapView'
-		this.map.setOnSingleTapListener(new OnSingleTapListener() {
-
-			private static final long serialVersionUID = 1L;
-
-			
-			public void onSingleTap(float x, float y) {
-				//Determines if the map is loaded
-				if (JMFoundation.this.map.isLoaded()) {
-
-					//Retrieves the dynamic layer
-					LayerView<?> layer = JMFoundation.this.map.getLayerById(JMFoundation.this.usaLayerId);
-
-					//Toggles the dynamic layer's visibility
-					if (layer.getVisibility() == ViewGroup.VISIBLE) {
-						layer.setVisibility(ViewGroup.INVISIBLE);
-					} else {
-						layer.setVisibility(ViewGroup.VISIBLE);
-					}
-				}
-
-			}
-		});
+//		this.map.setOnSingleTapListener(new OnSingleTapListener() {
+//
+//			private static final long serialVersionUID = 1L;
+//
+//			
+//			public void onSingleTap(float x, float y) {
+//				//Determines if the map is loaded
+//				if (JMFoundation.this.map.isLoaded()) {
+//
+//					//Retrieves the dynamic layer
+//					LayerView<?> layer = JMFoundation.this.map.getLayerById(JMFoundation.this.usaLayerId);
+//
+//					//Toggles the dynamic layer's visibility
+//					if (layer.getVisibility() == ViewGroup.VISIBLE) {
+//						layer.setVisibility(ViewGroup.INVISIBLE);
+//					} else {
+//						layer.setVisibility(ViewGroup.VISIBLE);
+//					}
+//				}
+//
+//			}
+//		});
 
 	}
 	

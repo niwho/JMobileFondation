@@ -6,6 +6,6 @@
     <string name="position">我的位置</string>
     <string name="gpslogging">跟踪中</string>
     <string name="find">适宜性评价</string>
-    <string name="query">路线查询</string>
+    <string name="query">引种决策</string>
     <string name="more">更多</string>
 </resources>
