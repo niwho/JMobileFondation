@@ -26,14 +26,14 @@ import android.widget.TextView;
  * @author Administrator
  * 
  */
-public class BubbleView{
+public class JMBubbleView{
 
     private MapView mapView;
     private View foot_popunwindwow;
     private PopupWindow mPopupWindow;
     //TextView textView;
     TextView textView;
-	public BubbleView(Context context,MapView mapView) {
+	public JMBubbleView(Context context,MapView mapView) {
 		
          this.mapView = mapView;
          LayoutInflater LayoutInflater = (LayoutInflater)((JMFoundation)context)
@@ -43,8 +43,6 @@ public class BubbleView{
 	     
 	    // mPopupWindow = new PopupWindow(foot_popunwindwow,
 			//		100, LayoutParams.WRAP_CONTENT,true);
-	     
-
 	}
 	 /**
 	* ¹Ø±ÕÆøÅÝ¿ò
