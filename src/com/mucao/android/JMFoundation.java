@@ -21,6 +21,8 @@ import android.util.Log;
 import com.esri.android.map.LayerView;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
+import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+import com.esri.android.map.ags.ArcGISLayerInfo;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Envelope;
 import com.mucao.android.JMFoundation;
@@ -30,7 +32,8 @@ public class JMFoundation extends Activity {
     /** Called when the activity is first created. */
 	JMDataSource					datasource_ = null;
 	
-	String 							dynamic_url_ = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
+	String 							dynamic_url_ = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer";
+//	String 							dynamic_url_ = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
 	MapView 						dynamic_map_ = null;
 	ArcGISDynamicMapServiceLayer  	dynamic_layer_ = null;
 	int 							layer_id_;
@@ -49,6 +52,7 @@ public class JMFoundation extends Activity {
 		this.dynamic_layer_ = new ArcGISDynamicMapServiceLayer(this, this.dynamic_url_);
 		
 		//Init datarouce
+		Log.v(JMFinal.g_tag_foundation_,"Init Datasource...");
 		this.datasource_ =  new JMDataSource();
 		if(this.datasource_.init(this.dynamic_url_, this.dynamic_layer_))
 		{
@@ -58,6 +62,7 @@ public class JMFoundation extends Activity {
 			
 		//Adds layer into the 'MapView'
 		this.dynamic_map_.addLayer(this.dynamic_layer_);
+		
 		this.layer_id_ = 1234;
 		dynamic_layer_.setId(this.layer_id_);
 	}
