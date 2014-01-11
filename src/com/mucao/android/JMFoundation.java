@@ -1,3 +1,5 @@
+
+
 package com.mucao.android;
 
 import android.app.Activity;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.util.Log;
 
 import com.esri.android.map.LayerView;
 import com.esri.android.map.MapView;
@@ -25,74 +28,39 @@ import com.mucao.android.R;
 
 public class JMFoundation extends Activity {
     /** Called when the activity is first created. */
-	private MapView map = null;
+	JMDataSource					datasource_ = null;
 	
-	//Dynamic layer URL from ArcGIS online
-	String dynamicMapURL = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
-	//String dynamicMapURL = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer";
-	//Layer id for dynamic layer
+	String 							dynamic_url_ = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
+	MapView 						dynamic_map_ = null;
+	ArcGISDynamicMapServiceLayer  	dynamic_layer_ = null;
+	int 							layer_id_;
 	
-	int usaLayerId;
+	private Button 					buttonZoomIn = null; 
+	private Button 					buttonZoomOut = null; 
 	
-	private Button buttonZoomIn = null; 
-	private Button buttonZoomOut = null;
-	
-	private static final int DIALOG_ABOUT_ID = 1;
+	private static final int 		DIALOG_ABOUT_ID = 1;
 	
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		this.map = (MapView) findViewById(R.id.map);
+		this.dynamic_map_ = (MapView) findViewById(R.id.map);
 		
 		//Creates a dynamic layer using service URL 
-		ArcGISDynamicMapServiceLayer dynamicLayer = new ArcGISDynamicMapServiceLayer(
-				this, this.dynamicMapURL);
+		this.dynamic_layer_ = new ArcGISDynamicMapServiceLayer(this, this.dynamic_url_);
+		
+		//init datarouce
+		//this.datasource_ =  new JMDataSource();
+		//if(this.datasource_.init(this.dynamic_url_, this.dynamic_layer_))
+		//{
+			//this.datasource_.switchPasture("");
+			//Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
+		//}
+			
 		//Adds layer into the 'MapView'
-		this.map.addLayer(dynamicLayer);
-		this.usaLayerId = 1234;
-		dynamicLayer.setId(this.usaLayerId);
-		
-//		this.buttonZoomIn = (Button) findViewById(R.id.buttonZoomIn); 
-//		this.buttonZoomOut = (Button) findViewById(R.id.buttonZoomOut); 
-		
-//		this.buttonZoomIn.setOnClickListener(new OnClickListener(){ 
-//			public void onClick(View v) {
-//				JMFoundation.this.map.zoomin();
-//			}
-//		}); 
-//		 
-//		this.buttonZoomOut.setOnClickListener(new OnClickListener() { 
-//			public void onClick(View v) {
-//				JMFoundation.this.map.zoomTo(env);
-//		 } 
-//		 });
-		
-
-		//Sets 'OnSingleTapListener' to 'MapView'
-//		this.map.setOnSingleTapListener(new OnSingleTapListener() {
-//
-//			private static final long serialVersionUID = 1L;
-//
-//			
-//			public void onSingleTap(float x, float y) {
-//				//Determines if the map is loaded
-//				if (JMFoundation.this.map.isLoaded()) {
-//
-//					//Retrieves the dynamic layer
-//					LayerView<?> layer = JMFoundation.this.map.getLayerById(JMFoundation.this.usaLayerId);
-//
-//					//Toggles the dynamic layer's visibility
-//					if (layer.getVisibility() == ViewGroup.VISIBLE) {
-//						layer.setVisibility(ViewGroup.INVISIBLE);
-//					} else {
-//						layer.setVisibility(ViewGroup.VISIBLE);
-//					}
-//				}
-//
-//			}
-//		});
-
+		this.dynamic_map_.addLayer(this.dynamic_layer_);
+		this.layer_id_ = 1234;
+		dynamic_layer_.setId(this.layer_id_);
 	}
 	
     //添加menu
@@ -116,6 +84,27 @@ public class JMFoundation extends Activity {
 	    
 	    //setMenuBackgroud();
 		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(final int id) {
+		Dialog dialog;
+
+		switch (id) {
+		case DIALOG_ABOUT_ID:
+			return new AlertDialog.Builder(JMFoundation.this).setIcon(R.drawable.icon)
+					.setTitle(R.string.app_name).setMessage("该软件归北京农业局拥有")
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog, final int whichButton) {
+						}
+					}).create();
+
+		default:
+			dialog = null;
+			break;
+		}
+		return dialog;
 	}
     
 	@Override
@@ -148,10 +137,9 @@ public class JMFoundation extends Activity {
 		          break;
 		      case 4:
 		    	  
-		    	  
-		          break;
+     	          break;
 		      case 5:
-		    	  
+		    		
 		          break;
 		      case 6:
 		    	  showDialog(DIALOG_ABOUT_ID);
@@ -159,34 +147,13 @@ public class JMFoundation extends Activity {
 		      case 7:
 		    	 // double lat = 30.581429;//佳丽广场
 			     // double lng = 114.285877;
-			      double lat = 30.581429;//佳丽广场
-			      double lng = 114.285877;
+			     // double lat = 30.581429;//佳丽广场
+			     // double lng = 114.285877;
 			      
-		    	  //mapView.addLabel(lng,lat,"佳丽广场",Html.fromHtml("佳丽广场"),R.drawable.poi_2);
+		    	 //mapView.addLabel(lng,lat,"佳丽广场",Html.fromHtml("佳丽广场"),R.drawable.poi_2);
 		          break;
 		    }
+		 
 		    return true;
 	}
-	
-	@Override
-	protected Dialog onCreateDialog(final int id) {
-		Dialog dialog;
-
-		switch (id) {
-		case DIALOG_ABOUT_ID:
-			return new AlertDialog.Builder(JMFoundation.this).setIcon(R.drawable.icon)
-					.setTitle(R.string.app_name).setMessage("该软件归北京农业局拥有")
-					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(final DialogInterface dialog, final int whichButton) {
-						}
-					}).create();
-
-		default:
-			dialog = null;
-			break;
-		}
-		return dialog;
-	}
-	
 }
