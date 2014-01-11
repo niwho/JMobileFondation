@@ -46,16 +46,15 @@ public class JMFoundation extends Activity {
 		setContentView(R.layout.main);
 		this.dynamic_map_ = (MapView) findViewById(R.id.map);
 		
-		//Creates a dynamic layer using service URL 
 		this.dynamic_layer_ = new ArcGISDynamicMapServiceLayer(this, this.dynamic_url_);
 		
-		//init datarouce
-		//this.datasource_ =  new JMDataSource();
-		//if(this.datasource_.init(this.dynamic_url_, this.dynamic_layer_))
-		//{
-			//this.datasource_.switchPasture("");
-			//Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
-		//}
+		//Init datarouce
+		this.datasource_ =  new JMDataSource();
+		if(this.datasource_.init(this.dynamic_url_, this.dynamic_layer_))
+		{
+			this.datasource_.switchPasture("");
+			Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
+		}
 			
 		//Adds layer into the 'MapView'
 		this.dynamic_map_.addLayer(this.dynamic_layer_);
@@ -110,7 +109,6 @@ public class JMFoundation extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
-		
 		 switch(item.getItemId())
 		    {
 		      case 0:
