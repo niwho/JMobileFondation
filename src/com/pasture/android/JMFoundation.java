@@ -25,8 +25,8 @@ import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.ags.ArcGISLayerInfo;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Envelope;
-import com.mucao.android.JMFoundation;
-import com.mucao.android.R;
+import com.pasture.android.JMFoundation;
+import com.pasture.android.R;
 
 public class JMFoundation extends Activity {
     /** Called when the activity is first created. */
