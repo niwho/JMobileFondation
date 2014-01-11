@@ -41,13 +41,4 @@
    
 </LinearLayout>
 
-
-<Button android:id="@+id/buttonZoomIn" android:text="放大" 
- android:layout_width="wrap_content" android:layout_height="wrap_content" 
- android:layout_alignParentBottom="true" android:layout_marginBottom="10dip" android:layout_marginLeft="10dip"/>
- 
-<Button android:id="@+id/buttonZoomOut" android:text="缩小" 
- android:layout_width="wrap_content" android:layout_height="wrap_content" 
- android:layout_alignParentBottom="true" android:layout_marginBottom="10dip" android:layout_marginLeft="60dip"/>
- 
 </RelativeLayout>

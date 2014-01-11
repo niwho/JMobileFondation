@@ -1,6 +1,9 @@
 package com.mucao.android;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -16,21 +19,25 @@ import com.esri.android.map.LayerView;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.event.OnSingleTapListener;
+import com.esri.core.geometry.Envelope;
 import com.mucao.android.JMFoundation;
 import com.mucao.android.R;
 
 public class JMFoundation extends Activity {
     /** Called when the activity is first created. */
 	private MapView map = null;
+	
 	//Dynamic layer URL from ArcGIS online
-	String dynamicMapURL = "http://192.168.1.102/ArcGIS/rest/services/mucao/MapServer";
+	String dynamicMapURL = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
 	//String dynamicMapURL = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer";
 	//Layer id for dynamic layer
 	
 	int usaLayerId;
 	
 	private Button buttonZoomIn = null; 
-	private Button buttonZoomOut = null; 
+	private Button buttonZoomOut = null;
+	
+	private static final int DIALOG_ABOUT_ID = 1;
 	
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -46,20 +53,20 @@ public class JMFoundation extends Activity {
 		this.usaLayerId = 1234;
 		dynamicLayer.setId(this.usaLayerId);
 		
-		this.buttonZoomIn = (Button) findViewById(R.id.buttonZoomIn); 
-		this.buttonZoomOut = (Button) findViewById(R.id.buttonZoomOut); 
+//		this.buttonZoomIn = (Button) findViewById(R.id.buttonZoomIn); 
+//		this.buttonZoomOut = (Button) findViewById(R.id.buttonZoomOut); 
 		
-		this.buttonZoomIn.setOnClickListener(new OnClickListener(){ 
-			public void onClick(View v) {
-				JMFoundation.this.map.zoomin(); 
-			}
-		}); 
-		 
-		this.buttonZoomOut.setOnClickListener(new OnClickListener() { 
-			public void onClick(View v) {
-				JMFoundation.this.map.zoomout(); 
-		 } 
-		 });
+//		this.buttonZoomIn.setOnClickListener(new OnClickListener(){ 
+//			public void onClick(View v) {
+//				JMFoundation.this.map.zoomin();
+//			}
+//		}); 
+//		 
+//		this.buttonZoomOut.setOnClickListener(new OnClickListener() { 
+//			public void onClick(View v) {
+//				JMFoundation.this.map.zoomTo(env);
+//		 } 
+//		 });
 		
 
 		//Sets 'OnSingleTapListener' to 'MapView'
@@ -104,10 +111,8 @@ public class JMFoundation extends Activity {
 		SubMenu subMenu=menu.addSubMenu(0,3,3,R.string.more);
 		subMenu.setIcon(android.R.drawable.ic_menu_more);
 		
-	    subMenu.add(0,4,0,"GPS设置");
 	    subMenu.add(0,5,1,"系统帮助");
 	    subMenu.add(0,6,2,"版权声明");
-	    subMenu.add(0,7,3,"添加标注");
 	    
 	    //setMenuBackgroud();
 		return super.onCreateOptionsMenu(menu);
@@ -146,11 +151,10 @@ public class JMFoundation extends Activity {
 		    	  
 		          break;
 		      case 5:
-		    		
+		    	  
 		          break;
 		      case 6:
-		      {}
-		  		
+		    	  showDialog(DIALOG_ABOUT_ID);
 		          break;
 		      case 7:
 		    	 // double lat = 30.581429;//佳丽广场
@@ -162,6 +166,27 @@ public class JMFoundation extends Activity {
 		          break;
 		    }
 		    return true;
+	}
+	
+	@Override
+	protected Dialog onCreateDialog(final int id) {
+		Dialog dialog;
+
+		switch (id) {
+		case DIALOG_ABOUT_ID:
+			return new AlertDialog.Builder(JMFoundation.this).setIcon(R.drawable.icon)
+					.setTitle(R.string.app_name).setMessage("该软件归北京农业局拥有")
+					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(final DialogInterface dialog, final int whichButton) {
+						}
+					}).create();
+
+		default:
+			dialog = null;
+			break;
+		}
+		return dialog;
 	}
 	
 }
