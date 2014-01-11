@@ -1,4 +1,4 @@
-package com.mucao.android;
+package com.pasture.android;
 
 public class JMFinal {
 	public static final String 			    g_tag_datasource_ = "DataSource";

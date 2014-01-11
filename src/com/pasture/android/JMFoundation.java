@@ -1,6 +1,5 @@
 
-
-package com.mucao.android;
+package com.pasture.android;
 
 import android.app.Activity;
 import android.app.AlertDialog;
