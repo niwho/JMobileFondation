@@ -171,7 +171,6 @@ public class JMDataSource {
 				ArcGISLayerInfo  adminGroup[] = groups[i].getLayers();	
 				
 				for(int j= 0 ;(null != adminGroup) && j < adminGroup.length ;j++){	
-					
 					ArcGISLayerInfo adminLayer = adminGroup[j];
 					if(adminLayer.getName().indexOf("省") != -1){
 						admin_layer_[AdminLayerIndex.PROVINCE.ordinal()] = adminLayer.getName();
@@ -211,11 +210,8 @@ public class JMDataSource {
 		}
 		
 		for(int i= 0 ;i < groups.length ;i++){
-			
 			if(groups[i].getName().indexOf("行政区") != -1)
 				continue;
-			
-			ArcGISLayerInfo familyGroup[] = groups[i].getLayers();
 			
 			JMGrassFamily family = new JMGrassFamily();		
 			family.family_ = groups[i].getName();
@@ -224,8 +220,8 @@ public class JMDataSource {
 			Log.v(JMFinal.g_tag_datasource_,"Family Name:" + family.family_);
 			Log.v(JMFinal.g_tag_datasource_,"Family Url:" + family.family_url_);
 			
+			ArcGISLayerInfo familyGroup[] = groups[i].getLayers();
 			for(int j= 0 ;(null != familyGroup) && j < familyGroup.length;j++){		
-				ArcGISLayerInfo pastureGroup[] = familyGroup[j].getLayers();
 				JMPasture pasture = new JMPasture();
 				pasture.name_ = familyGroup[j].getName();
 				pasture.pasture_url_ = family.family_url_ + "\\" + pasture.name_;
@@ -234,10 +230,8 @@ public class JMDataSource {
 				Log.v(JMFinal.g_tag_datasource_,"Pasture Url:" + pasture.pasture_url_);
 				
 				//pasure
-				for(int k= 0 ;(null != pastureGroup) && k < pastureGroup.length ;k++){			
-					Log.v(JMFinal.g_tag_datasource_,
-							"Layer Name = "+pastureGroup[k].getName()+",ID = "+ pastureGroup[k].getId());	
-					
+				ArcGISLayerInfo pastureGroup[] = familyGroup[j].getLayers();
+				for(int k= 0 ;(null != pastureGroup) && k < pastureGroup.length ;k++){
 					ArcGISLayerInfo lyrInfo = pastureGroup[k];
 					lyrInfo.setVisible(false);
 					
@@ -269,26 +263,24 @@ public class JMDataSource {
 				
 					if(admin_index != -1 && shiyi_index != -1)
 					{
-						Log.v(JMFinal.g_tag_datasource_,"Pasture Vector Layer:"+lyrInfo.getName());
 						pasture.vector_layer_[admin_index][shiyi_index] = lyrInfo.getName();
 						pasture.vector_layer_id_[admin_index][shiyi_index] = lyrInfo.getId();
 						pasture.vector_layer_info_[admin_index][shiyi_index] = lyrInfo;
 					}
 					else
 					{
-						Log.v(JMFinal.g_tag_datasource_,"Pasture Raster Layer:"+lyrInfo.getName());
 						pasture.raster_layer_ = lyrInfo.getName();
 						pasture.raster_layer_id_ = lyrInfo.getId();
 						pasture.raster_layer_info_ = lyrInfo;
 					}
 				}
 				
-				for(i = 0; i < 3 ;i++){
-					for(j = 0; j < 2 ;j++){
+				for(int m = 0; m < 3 ;m++){
+					for(int n = 0; n < 2 ;n++){
 					  Log.v(JMFinal.g_tag_datasource_,
-							  "Vector Layer Name:"+ pasture.vector_layer_[i][j]);	
+							  "Vector Layer Name:"+ pasture.vector_layer_[m][n]);	
 					  Log.v(JMFinal.g_tag_datasource_,
-							  "Vector Layer ID:" + pasture.vector_layer_id_[i][j]);	
+							  "Vector Layer ID:" + pasture.vector_layer_id_[m][n]);	
 					}
 				}
 				
