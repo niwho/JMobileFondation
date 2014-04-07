@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.util.Log;
 
-import com.esri.android.map.LayerView;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
@@ -32,14 +31,11 @@ public class JMFoundation extends Activity {
     /** Called when the activity is first created. */
 	JMDataSource					datasource_ = null;
 	
-	String 							dynamic_url_ = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer";
-//	String 							dynamic_url_ = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
+//	String 							dynamic_url_ = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer";
+	String 							dynamic_url_ = "http://192.168.1.101/ArcGIS/rest/services/JMobileServer/MapServer";
 	MapView 						map_view_ = null;
 	ArcGISDynamicMapServiceLayer  	dynamic_layer_ = null;
 	int 							layer_id_;
-	
-	private Button 					buttonZoomIn = null; 
-	private Button 					buttonZoomOut = null; 
 	
 	private static final int 		DIALOG_ABOUT_ID = 1;
 	
@@ -50,13 +46,9 @@ public class JMFoundation extends Activity {
 		
 		this.map_view_ = (MapView) findViewById(R.id.map);
 		
-		this.dynamic_layer_ = new ArcGISDynamicMapServiceLayer(this, this.dynamic_url_);
+		this.dynamic_layer_ = new ArcGISDynamicMapServiceLayer(this.dynamic_url_);
 		
-		//Adds layer into the 'MapView'
 		this.map_view_.addLayer(this.dynamic_layer_);
-		
-		this.layer_id_ = 1234;
-		this.dynamic_layer_.setId(this.layer_id_);
 		
 		//
 		this.map_view_.setOnLongPressListener(new OnLongPressListener() {

@@ -56,6 +56,7 @@ public class JMDataSource {
 	}
 
 	public void setServiceUrl(String service_url_) {
+		Log.v(JMFinal.g_tag_datasource_,"Set Service...");
 		this.service_url_ = service_url_;
 	}
 
@@ -80,22 +81,19 @@ public class JMDataSource {
 	}
 
 	public void setDynamicLayer(ArcGISDynamicMapServiceLayer dynamicLayer) {
+		Log.v(JMFinal.g_tag_datasource_,"Set Dynamic Layer...");
 		this.dynamicLayer_ = dynamicLayer;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////
-	public Boolean init(String service_url,ArcGISDynamicMapServiceLayer dynamic_layer){
+	public Boolean init(String service_url,
+			ArcGISDynamicMapServiceLayer dynamic_layer){
+		
 		Log.v(JMFinal.g_tag_datasource_,"Init DataSource...");
-		
-		//
-		Log.v(JMFinal.g_tag_datasource_,"Set Service...");
+			
 		setServiceUrl(service_url);
-		
-		//
-		Log.v(JMFinal.g_tag_datasource_,"Set Dynamic Layer...");
 		setDynamicLayer(dynamic_layer);
 			
-		//
 		Log.v(JMFinal.g_tag_datasource_,"Refresh DataSource...");
 		return refreshAdministrative() && refreshPasture();
     }
@@ -103,7 +101,6 @@ public class JMDataSource {
 	public Boolean switchPasture(String pasture_name){
 		
 		Log.v(JMFinal.g_tag_datasource_,"Switch Pasture...");
-		
 		setActivePasure(GetPastureByName(pasture_name));
 		
 		 for(int i = 0; i < this.family_list_.size();i++){
@@ -160,30 +157,33 @@ public class JMDataSource {
 	protected Boolean refreshAdministrative(){
 		Log.v(JMFinal.g_tag_datasource_,"Refresh Administrative...");
 		
-		ArcGISLayerInfo adminGroups[] = dynamicLayer_.getLayers();
-		if(adminGroups == null)
+		ArcGISLayerInfo groups[] = dynamicLayer_.getLayers();
+		if(groups == null)
 		{
-			Log.v(JMFinal.g_tag_datasource_,"Unsupport getLayers@ArcGISDynamicMapServiceLayer");
+			Log.v(JMFinal.g_tag_datasource_,
+					"Unsupport getLayers@ArcGISDynamicMapServiceLayer");
 			return false;
 		}
 		
-		for(int i= 0 ;i < adminGroups.length ;i++){
-			if(adminGroups[i].getName() == "行政图")
+		for(int i= 0 ;i < groups.length ;i++){
+			if(groups[i].getName().indexOf("行政区") != -1)
 			{
-				List<ArcGISLayerInfo> adminGroup = adminGroups[i].getLayers();	
-				for(int j= 0 ;j < adminGroup.size() ;j++){	
-					ArcGISLayerInfo pastureGroup = adminGroup.get(j);
-					if(pastureGroup.getName().indexOf("省") != -1){
-						admin_layer_[AdminLayerIndex.PROVINCE.ordinal()] = pastureGroup.getName();
-						admin_layer_id_[AdminLayerIndex.PROVINCE.ordinal()] = pastureGroup.getId();
+				ArcGISLayerInfo  adminGroup[] = groups[i].getLayers();	
+				
+				for(int j= 0 ;(null != adminGroup) && j < adminGroup.length ;j++){	
+					
+					ArcGISLayerInfo adminLayer = adminGroup[j];
+					if(adminLayer.getName().indexOf("省") != -1){
+						admin_layer_[AdminLayerIndex.PROVINCE.ordinal()] = adminLayer.getName();
+						admin_layer_id_[AdminLayerIndex.PROVINCE.ordinal()] = adminLayer.getId();
 					}	
-					else if(pastureGroup.getName().indexOf("市") != -1){
-						admin_layer_[AdminLayerIndex.CITY.ordinal()] = pastureGroup.getName();
-						admin_layer_id_[AdminLayerIndex.CITY.ordinal()] = pastureGroup.getId();
+					else if(adminLayer.getName().indexOf("市") != -1){
+						admin_layer_[AdminLayerIndex.CITY.ordinal()] = adminLayer.getName();
+						admin_layer_id_[AdminLayerIndex.CITY.ordinal()] = adminLayer.getId();
 					}	
-					else if(pastureGroup.getName().indexOf("县") != -1){
-						admin_layer_[AdminLayerIndex.COUNTY.ordinal()] = pastureGroup.getName();
-						admin_layer_id_[AdminLayerIndex.COUNTY.ordinal()] = pastureGroup.getId();
+					else if(adminLayer.getName().indexOf("县") != -1){
+						admin_layer_[AdminLayerIndex.COUNTY.ordinal()] = adminLayer.getName();
+						admin_layer_id_[AdminLayerIndex.COUNTY.ordinal()] = adminLayer.getId();
 					}				
 				}
 			}		
@@ -191,48 +191,54 @@ public class JMDataSource {
 		
 		for(int i = 0; i < 3 ;i++){
 			Log.v(JMFinal.g_tag_datasource_,"Administrative Layer Name:"+ admin_layer_[i]);	
-			Log.v(JMFinal.g_tag_datasource_,"Administrative Layer ID:" + "" + admin_layer_id_[i]);	
+			Log.v(JMFinal.g_tag_datasource_,"Administrative Layer ID:" + admin_layer_id_[i]);	
 		}
 		
 		return true;
 	}
-	
+
 	protected Boolean refreshPasture(){
 		
 		Log.v(JMFinal.g_tag_datasource_,"Refresh Pasture...");
 		
-		ArcGISLayerInfo familyGroups[] = dynamicLayer_.getLayers();
-		if(familyGroups == null)
+		ArcGISLayerInfo groups[] = dynamicLayer_.getLayers();
+		if(groups == null)
 		{
-			Log.v(JMFinal.g_tag_datasource_,"Unsupport getLayers@ArcGISDynamicMapServiceLayer");
+			Log.v(JMFinal.g_tag_datasource_,
+					"Unsupport getLayers@ArcGISDynamicMapServiceLayer");
+			
 			return false;
 		}
 		
-		for(int i= 0 ;i < familyGroups.length ;i++){
-			if(familyGroups[i].getName() == "行政图")
+		for(int i= 0 ;i < groups.length ;i++){
+			
+			if(groups[i].getName().indexOf("行政区") != -1)
 				continue;
 			
-			List<ArcGISLayerInfo> familyGroup = familyGroups[i].getLayers();
+			ArcGISLayerInfo familyGroup[] = groups[i].getLayers();
 			
 			JMGrassFamily family = new JMGrassFamily();		
-			family.family_ = familyGroups[i].getName();
+			family.family_ = groups[i].getName();
 			family.family_url_ = service_url_ + "\\" + family.family_;
+			
 			Log.v(JMFinal.g_tag_datasource_,"Family Name:" + family.family_);
 			Log.v(JMFinal.g_tag_datasource_,"Family Url:" + family.family_url_);
 			
-			for(int j= 0 ;j < familyGroup.size() ;j++){	
-				
-				List<ArcGISLayerInfo> pastureGroup = familyGroup.get(j).getLayers();
+			for(int j= 0 ;(null != familyGroup) && j < familyGroup.length;j++){		
+				ArcGISLayerInfo pastureGroup[] = familyGroup[j].getLayers();
 				JMPasture pasture = new JMPasture();
-				pasture.name_ = familyGroup.get(j).getName();
+				pasture.name_ = familyGroup[j].getName();
 				pasture.pasture_url_ = family.family_url_ + "\\" + pasture.name_;
 				
 				Log.v(JMFinal.g_tag_datasource_,"Pasture Name:" + pasture.name_);
 				Log.v(JMFinal.g_tag_datasource_,"Pasture Url:" + pasture.pasture_url_);
 				
 				//pasure
-				for(int k= 0 ;k < pastureGroup.size() ;k++){			
-					ArcGISLayerInfo lyrInfo = pastureGroup.get(k);
+				for(int k= 0 ;(null != pastureGroup) && k < pastureGroup.length ;k++){			
+					Log.v(JMFinal.g_tag_datasource_,
+							"Layer Name = "+pastureGroup[k].getName()+",ID = "+ pastureGroup[k].getId());	
+					
+					ArcGISLayerInfo lyrInfo = pastureGroup[k];
 					lyrInfo.setVisible(false);
 					
 					int admin_index = -1, shiyi_index = -1;
@@ -279,13 +285,15 @@ public class JMDataSource {
 				
 				for(i = 0; i < 3 ;i++){
 					for(j = 0; j < 2 ;j++){
-					  Log.v(JMFinal.g_tag_datasource_,"Vector Layer Name:"+ pasture.vector_layer_[i][j]);	
-					  Log.v(JMFinal.g_tag_datasource_,"Vector Layer ID:" + "" + pasture.vector_layer_id_[i][j]);	
+					  Log.v(JMFinal.g_tag_datasource_,
+							  "Vector Layer Name:"+ pasture.vector_layer_[i][j]);	
+					  Log.v(JMFinal.g_tag_datasource_,
+							  "Vector Layer ID:" + pasture.vector_layer_id_[i][j]);	
 					}
 				}
 				
 				Log.v(JMFinal.g_tag_datasource_,"Raster Layer Name:"+ pasture.raster_layer_);	
-			    Log.v(JMFinal.g_tag_datasource_,"Raster Layer ID:" + "" + pasture.raster_layer_id_);	
+			    Log.v(JMFinal.g_tag_datasource_,"Raster Layer ID:" + pasture.raster_layer_id_);	
 
 				family.pasture_list_.add(pasture);		
 			}	 
