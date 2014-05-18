@@ -32,7 +32,7 @@ public class JMFoundation extends Activity {
 	JMDataSource					datasource_ = null;
 	
 //	String 							dynamic_url_ = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer";
-	String 							dynamic_url_ = "http://192.168.1.101/ArcGIS/rest/services/JMobileServer/MapServer";
+	String 							dynamic_url_ = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
 	MapView 						map_view_ = null;
 	ArcGISDynamicMapServiceLayer  	dynamic_layer_ = null;
 	int 							layer_id_;
@@ -61,7 +61,7 @@ public class JMFoundation extends Activity {
 					datasource_ =  new JMDataSource();
 					if(datasource_.init(dynamic_url_, dynamic_layer_))
 					{
-						datasource_.switchPasture("");
+						datasource_.switchPasture("ÖÐ¼ä½õ¼¦¶ù");
 						Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
 					}					
 				}
