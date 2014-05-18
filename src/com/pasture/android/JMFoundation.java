@@ -56,7 +56,14 @@ public class JMFoundation extends Activity {
 
 			public void onLongPress(float x, float y) {
 				if(map_view_.isLoaded()){
-					
+					Log.v(JMFinal.g_tag_foundation_,"Load OK... ");
+					Log.v(JMFinal.g_tag_foundation_,"Init Datasource...");
+					datasource_ =  new JMDataSource();
+					if(datasource_.init(dynamic_url_, dynamic_layer_))
+					{
+						datasource_.switchPasture("ÖÐ¼ä½õ¼¦¶ù");
+						Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
+					}
 				}
 			}
 		});

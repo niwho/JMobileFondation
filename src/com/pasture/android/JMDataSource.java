@@ -100,12 +100,16 @@ public class JMDataSource {
 	
 	public Boolean switchPasture(String pasture_name){
 		
-		Log.v(JMFinal.g_tag_datasource_,"Switch Pasture...");
+		Log.v(JMFinal.g_tag_datasource_,"Switch Pasture £º"+pasture_name);
 		setActivePasure(GetPastureByName(pasture_name));
 		
 		 for(int i = 0; i < this.family_list_.size();i++){
 			 JMGrassFamily family = this.family_list_.get(i);
+			 Log.v(JMFinal.g_tag_datasource_,"family"+family.family_);
 			 for(int j = 0; j < family.pasture_list_.size();j++ ){
+				 Log.v(JMFinal.g_tag_datasource_,
+						 "pasture"+family.pasture_list_.get(j).name_);
+					
 				 if(family.pasture_list_.get(j).name_ == pasture_name)
 					 family.pasture_list_.get(j).raster_layer_info_.setVisible(true);
 				 else
@@ -301,8 +305,12 @@ public class JMDataSource {
 		 for(int i = 0; i < this.family_list_.size();i++){
 			 JMGrassFamily family = this.family_list_.get(i);
 			 for(int j = 0; j < family.pasture_list_.size();j++ ){
-				 if(family.pasture_list_.get(j).name_ == pasture_name)
+				 if(family.pasture_list_.get(j).name_ == pasture_name){
+					  Log.v(JMFinal.g_tag_datasource_,
+							  "GetPastureByName:"+ pasture_name);	
+	
 					 return family.pasture_list_.get(j);
+				 }
 			 }
 		 }
          
