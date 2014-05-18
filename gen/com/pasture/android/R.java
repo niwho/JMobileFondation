@@ -35,18 +35,15 @@ public final class R {
         public static final int search_toolbar_button=0x7f020011;
     }
     public static final class id {
-        public static final int imgclose=0x7f070001;
-        public static final int imgline=0x7f070002;
-        public static final int layers=0x7f070007;
-        public static final int map=0x7f070004;
-        public static final int mylocation=0x7f070008;
-        public static final int places=0x7f070006;
-        public static final int search_edit=0x7f070005;
-        public static final int text=0x7f070003;
-        public static final int title=0x7f070000;
+        public static final int layers=0x7f070004;
+        public static final int map=0x7f070001;
+        public static final int mylocation=0x7f070005;
+        public static final int places=0x7f070003;
+        public static final int search_edit=0x7f070002;
+        public static final int text=0x7f070000;
     }
     public static final class layout {
-        public static final int bubble_view=0x7f030000;
+        public static final int item_view=0x7f030000;
         public static final int main=0x7f030001;
     }
     public static final class string {

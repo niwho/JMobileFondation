@@ -1,11 +1,17 @@
 
 package com.pasture.android;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
@@ -15,29 +21,48 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.util.Log;
 
+import com.esri.core.renderer.SimpleRenderer;
+import com.esri.core.symbol.SimpleFillSymbol;
+import com.esri.core.tasks.ags.query.Query;
+import com.esri.core.tasks.ags.query.QueryTask;
+
+import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.ags.ArcGISLayerInfo;
 import com.esri.android.map.event.OnLongPressListener;
 import com.esri.android.map.event.OnSingleTapListener;
+import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.android.map.event.OnStatusChangedListener.STATUS;
 import com.esri.core.geometry.Envelope;
+import com.esri.core.map.FeatureSet;
+import com.esri.core.map.Graphic;
 import com.pasture.android.JMFoundation;
 import com.pasture.android.R;
 
 public class JMFoundation extends Activity {
     /** Called when the activity is first created. */
 	JMDataSource					datasource_ = null;
-	
-//	String 							dynamic_url_ = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer";
+	List<String> 					pasture_name_list = null;
+
 	String 							dynamic_url_ = "http://192.168.1.107/ArcGIS/rest/services/JMobileServer/MapServer";
+	
 	MapView 						map_view_ = null;
 	ArcGISDynamicMapServiceLayer  	dynamic_layer_ = null;
 	int 							layer_id_;
 	
 	private static final int 		DIALOG_ABOUT_ID = 1;
+	
+	Button layer_btn = null;
+	Button query_btn = null;
+	
+	EditText txtQueryString = null;
+	
+	GraphicsLayer mGraphicsLayer;
 	
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -46,31 +71,133 @@ public class JMFoundation extends Activity {
 		
 		this.map_view_ = (MapView) findViewById(R.id.map);
 		
+		this.layer_btn = (Button) findViewById(R.id.layers);
+		this.query_btn = (Button) findViewById(R.id.places);
+		
+		this.txtQueryString = (EditText) findViewById(R.id.search_edit);
+		
 		this.dynamic_layer_ = new ArcGISDynamicMapServiceLayer(this.dynamic_url_);
 		
 		this.map_view_.addLayer(this.dynamic_layer_);
 		
-		//
-		this.map_view_.setOnLongPressListener(new OnLongPressListener() {
+		this.map_view_.setOnStatusChangedListener(new OnStatusChangedListener() {
 			private static final long serialVersionUID = 1L;
 
-			public void onLongPress(float x, float y) {
-				if(map_view_.isLoaded()){
-					Log.v(JMFinal.g_tag_foundation_,"Load OK... ");
-					Log.v(JMFinal.g_tag_foundation_,"Init Datasource...");
-					datasource_ =  new JMDataSource();
-					if(datasource_.init(dynamic_url_, dynamic_layer_))
-					{
-						datasource_.switchPasture("ÖĞ¼ä½õ¼¦¶ù");
-						Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
-					}					
+			@Override
+            public void onStatusChanged(Object source, STATUS status) {
+                if (status.equals(STATUS.INITIALIZATION_FAILED)) {
+                	Log.v(JMFinal.g_tag_foundation_,"INITIALIZATION_FAILED");
+                }
+                ;
+
+                if (status.equals(STATUS.INITIALIZED)) {
+                    Log.v(JMFinal.g_tag_foundation_,"INITIALIZED");
+                }
+                ;
+                if (status.equals(STATUS.LAYER_LOADED)) {
+                    if(map_view_.isLoaded()){
+    					Log.v(JMFinal.g_tag_foundation_,"Load OK... ");
+    					Log.v(JMFinal.g_tag_foundation_,"Init Datasource...");
+    					datasource_ =  new JMDataSource();
+    					if(datasource_.init(dynamic_url_, dynamic_layer_))
+    					{
+    						pasture_name_list = datasource_.getAllPastureName();
+							Log.v(JMFinal.g_tag_foundation_,"Pasture Count: "+pasture_name_list.size());
+    						if(pasture_name_list.size() > 0)
+    							datasource_.switchPasture(pasture_name_list.get(0));
+    						
+    						Log.v(JMFinal.g_tag_foundation_,"Init Datasource OK");
+    					}					
+    				}
+                }
+                ;
+
+                if (status.equals(STATUS.LAYER_LOADING_FAILED)) {
+                    Log.v(JMFinal.g_tag_foundation_,"å›¾å±‚åŠ è½½å¤±è´¥");
+                }
+                ;
+            }
+        });
+		
+		this.layer_btn.setOnClickListener(new View.OnClickListener(){
+				@Override
+				public void onClick(View v){
+					
+					JMAdapterView adapter = new JMAdapterView(JMFoundation.this, pasture_name_list);
+					new AlertDialog.Builder(JMFoundation.this)
+						.setTitle("å›¾å±‚åˆ‡æ¢")
+						.setAdapter(adapter,new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								datasource_.switchPasture(pasture_name_list.get(which));	
+								JMPasture pasture = datasource_.getActivepasture();
+								String    pasture_url = JMDataSource.getPastureUrl(pasture, 0, 0);
+								Log.v(JMFinal.g_tag_foundation_,"Pasture URL: "+pasture_url);
+								
+								JMFoundation.this.map_view_.zoomin();
+							};
+							})
+						.show();
 				}
-			}
 		});
+		
+		this.query_btn.setOnClickListener(new View.OnClickListener(){
+			@Override
+			public void onClick(View v){
+				
+				String keyQuery=txtQueryString.getText().toString();
+				Query query=new Query();
+				query.setWhere("NAME like '%" + keyQuery + "%'");
+				query.setReturnGeometry(true);
+				
+				JMPasture pasture = datasource_.getActivepasture();
+				String  pasture_url = JMDataSource.getPastureUrl(pasture, 0, 0);
+				
+				
+				String queryUrl = pasture_url;
+				QueryTask queryTask=new QueryTask(queryUrl);
+
+				FeatureSet fs = null;//ç»“æœé›†
+				try {
+					fs=queryTask.execute(query);//æ‰§è¡ŒæŸ¥è¯¢
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+				}
+				
+				GraphicsLayer graphicsLayer = GetGraphicLayer();
+				if(fs!=null && graphicsLayer.isInitialized() && graphicsLayer.isVisible()){
+						Graphic[] grs = fs.getGraphics();
+						if(grs.length>0){
+						SimpleFillSymbol symbol =new SimpleFillSymbol(
+							Color.RED);
+						//è®¾å®šå‘ˆç°æ–¹å¼
+						graphicsLayer.setRenderer(new SimpleRenderer(symbol));
+						//æ·»åŠ Â graphicå¸¦å›¾å±‚ï¼Œè¿™æ—¶ï¼Œä¼šè‡ªåŠ¨ç”¨åˆšåˆšæŒ‡å®šçš„â€œå‘ˆç°æ–¹å¼â€æ¥å‘ˆç°
+						graphicsLayer.removeAll();//ç§»é™¤ä»¥å‰çš„
+						graphicsLayer.addGraphics(grs);
+
+						}
+
+					}
+
+				}
+
+	});
 	
 	}
+	private GraphicsLayer GetGraphicLayer(){
+		if(mGraphicsLayer==null){
+			mGraphicsLayer=new GraphicsLayer();
+			
+			this.map_view_.addLayer(mGraphicsLayer);
+			this.map_view_.setExtent(mGraphicsLayer.getExtent());
+		}
+		return mGraphicsLayer;
+	}
 	
-    //Ìí¼Ómenu
+    //æ·»åŠ menu
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
@@ -86,8 +213,8 @@ public class JMFoundation extends Activity {
 		SubMenu subMenu=menu.addSubMenu(0,3,3,R.string.more);
 		subMenu.setIcon(android.R.drawable.ic_menu_more);
 		
-	    subMenu.add(0,5,1,"ÏµÍ³°ïÖú");
-	    subMenu.add(0,6,2,"°æÈ¨ÉùÃ÷");
+	    subMenu.add(0,5,1,"ç³»ç»Ÿå¸®åŠ©");
+	    subMenu.add(0,6,2,"ç‰ˆæƒå£°æ˜");
 	    
 	    //setMenuBackgroud();
 		return super.onCreateOptionsMenu(menu);
@@ -100,10 +227,11 @@ public class JMFoundation extends Activity {
 		switch (id) {
 		case DIALOG_ABOUT_ID:
 			return new AlertDialog.Builder(JMFoundation.this).setIcon(R.drawable.icon)
-					.setTitle(R.string.app_name).setMessage("¸ÃÈí¼ş¹é±±¾©Å©Òµ¾ÖÓµÓĞ")
+					.setTitle(R.string.app_name).setMessage("è¯¥è½¯ä»¶å½’åŒ—äº¬å†œä¸šå±€æ‹¥æœ‰")
 					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(final DialogInterface dialog, final int whichButton) {
+							
 						}
 					}).create();
 
@@ -120,19 +248,19 @@ public class JMFoundation extends Activity {
 		 switch(item.getItemId())
 		    {
 		      case 0:
-		    	  //ËÑË÷ÉèÖÃ
+		    	  //æœç´¢è®¾ç½®
 		         //SearchView search = new SearchView(this,this.mapView);
 		         ///search.ShowQueryWin();
 		         
 		        break;
 		      case 1:
-		    	  //GPS¸ú×Ù
+		    	  //GPSè·Ÿè¸ª
 		    	    //Intent intent = new Intent(this, ControlTracking.class);
 		            //startActivity(intent);
 				
 		        break;
 		      case 2:
-		    	  //Â·Ïß²éÑ¯
+		    	  //è·¯çº¿æŸ¥è¯¢
 		    	    //Intent intent1 = new Intent(this, GoogleMapRoutes.class);
 		            //startActivity(intent1);
 		    	  
@@ -151,12 +279,12 @@ public class JMFoundation extends Activity {
 		    	  showDialog(DIALOG_ABOUT_ID);
 		          break;
 		      case 7:
-		    	 // double lat = 30.581429;//¼ÑÀö¹ã³¡
+		    	 // double lat = 30.581429;//ä½³ä¸½å¹¿åœº
 			     // double lng = 114.285877;
-			     // double lat = 30.581429;//¼ÑÀö¹ã³¡
+			     // double lat = 30.581429;//ä½³ä¸½å¹¿åœº
 			     // double lng = 114.285877;
 			      
-		    	 //mapView.addLabel(lng,lat,"¼ÑÀö¹ã³¡",Html.fromHtml("¼ÑÀö¹ã³¡"),R.drawable.poi_2);
+		    	 //mapView.addLabel(lng,lat,"ä½³ä¸½å¹¿åœº",Html.fromHtml("ä½³ä¸½å¹¿åœº"),R.drawable.poi_2);
 		          break;
 		    }
 		 

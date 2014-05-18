@@ -1,5 +1,6 @@
 package com.pasture.android;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,7 +99,7 @@ public class JMDataSource {
 		return refreshAdministrative() && refreshPasture();
     }
 	
-	public Boolean switchPasture(String pasture_name){
+	public Boolean switchPasture_Org(String pasture_name){
 		
 		Log.v(JMFinal.g_tag_datasource_,"Switch Pasture ："+pasture_name);
 		setActivePasure(GetPastureByName(pasture_name));
@@ -110,16 +111,79 @@ public class JMDataSource {
 				 Log.v(JMFinal.g_tag_datasource_,
 						 "pasture"+family.pasture_list_.get(j).name_);
 					
-				 if(family.pasture_list_.get(j).name_ == pasture_name)
+				 if(family.pasture_list_.get(j).name_ == pasture_name){
 					 family.pasture_list_.get(j).raster_layer_info_.setVisible(true);
-				 else
+				 }
+				 else{
 					 family.pasture_list_.get(j).raster_layer_info_.setVisible(false);
+				 }
 			 }
 		 }
 		
 		return true;
     }
 	
+	protected Boolean switchPasture(String pasture_name){
+		
+		Log.v(JMFinal.g_tag_datasource_,"Switch Pasture To: "+pasture_name);
+		setActivePasure(GetPastureByName(pasture_name));
+		
+		ArcGISLayerInfo groups[] = dynamicLayer_.getLayers();
+		if(groups == null)
+		{
+			Log.v(JMFinal.g_tag_datasource_,
+					"Unsupport getLayers@ArcGISDynamicMapServiceLayer");
+			
+			return false;
+		}
+		
+		for(int i= 0 ;i < groups.length ;i++){
+			if(groups[i].getName().indexOf("行政区") != -1)
+				continue;		
+			
+			ArcGISLayerInfo familyGroup[] = groups[i].getLayers();
+			for(int j= 0 ;(null != familyGroup) && j < familyGroup.length;j++){				
+				//pasure
+				Boolean visble = (familyGroup[j].getName() == pasture_name);
+				ArcGISLayerInfo pastureGroup[] = familyGroup[j].getLayers();
+				for(int k= 0 ;(null != pastureGroup) && k < pastureGroup.length ;k++){
+					ArcGISLayerInfo lyrInfo = pastureGroup[k];
+					
+					int admin_index = -1, shiyi_index = -1;
+					
+					//admin index
+					if(lyrInfo.getName().indexOf("省") != -1)
+					{
+						admin_index = AdminLayerIndex.PROVINCE.ordinal();
+					}
+					else if(lyrInfo.getName().indexOf("市") != -1)
+					{
+						admin_index = AdminLayerIndex.CITY.ordinal();
+					}
+					else if(lyrInfo.getName().indexOf("县") != -1)
+					{
+						admin_index = AdminLayerIndex.COUNTY.ordinal();
+					}
+					
+					//shiyi type
+					if(lyrInfo.getName().indexOf("次适宜") != -1)
+					{
+						shiyi_index = ShiyiLayerIndex.CISHIYI.ordinal();
+					}
+					else if(lyrInfo.getName().indexOf("适宜") != -1)
+					{
+						shiyi_index = ShiyiLayerIndex.SHIYI.ordinal();
+					}
+				
+					if(admin_index != -1 && shiyi_index != -1)
+						lyrInfo.setVisible(visble);
+				}
+			}	 
+		}	
+		
+		return true;
+    }
+
 	public Boolean switchAdministrative(String admin_name){
 		
 		Log.v(JMFinal.g_tag_datasource_,"Switch Administrative...");
@@ -149,13 +213,28 @@ public class JMDataSource {
 			return "";
 		}
 		
-		String url = pasture.pasture_url_ + "\\" + 
+		String url = pasture.pasture_url_ + "/" + 
 					 pasture.vector_layer_id_[admin_index][shiyi_index];
 		
 		Log.v(JMFinal.g_tag_datasource_,"getPastureUrl:"+url);
 		
 		return url;
 	}
+	
+	public List<String> getAllPastureName(){
+		
+		List<String> pasture_names = new ArrayList<String>();
+		 Log.v(JMFinal.g_tag_datasource_,"Get Pastures");
+		 for(int i = 0; i < this.family_list_.size();i++){
+			 JMGrassFamily family = this.family_list_.get(i);
+			 Log.v(JMFinal.g_tag_datasource_,"family"+family.family_);
+			 for(int j = 0; j < family.pasture_list_.size();j++ ){					
+				 pasture_names.add(family.pasture_list_.get(j).name_);
+			 }
+		 }
+		
+		return pasture_names;
+    }
 	
 	////////////////////////////////////////////////////////////////////////////////
 	protected Boolean refreshAdministrative(){
@@ -228,7 +307,7 @@ public class JMDataSource {
 			for(int j= 0 ;(null != familyGroup) && j < familyGroup.length;j++){		
 				JMPasture pasture = new JMPasture();
 				pasture.name_ = familyGroup[j].getName();
-				pasture.pasture_url_ = family.family_url_ + "\\" + pasture.name_;
+				pasture.pasture_url_ = service_url_;
 				
 				Log.v(JMFinal.g_tag_datasource_,"Pasture Name:" + pasture.name_);
 				Log.v(JMFinal.g_tag_datasource_,"Pasture Url:" + pasture.pasture_url_);
