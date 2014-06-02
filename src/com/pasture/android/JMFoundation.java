@@ -102,7 +102,7 @@ public class JMFoundation extends Activity {
     					if(datasource_.init(dynamic_url_, dynamic_layer_))
     					{
     						pasture_name_list = datasource_.getAllPastureName();
-							Log.v(JMFinal.g_tag_foundation_,"Pasture Count: "+pasture_name_list.size());
+							Log.v(JMFinal.g_tag_foundation_,"Pasture Count: " + pasture_name_list.size());
     						if(pasture_name_list.size() > 0)
     							datasource_.switchPasture(pasture_name_list.get(0));
     						
